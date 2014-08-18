@@ -6,3 +6,20 @@
 #
 # Pods/
 
+# ignore webstorm editor project files
+.idea/*
+.idea/**/*
+.idea/encodings.xml
+.idea/examples.iml
+.idea/inspectionProfiles/profiles_settings.xml
+.idea/inspectionProfiles/Project_Default.xml
+.idea/misc.xml
+.idea/modules.xml
+.idea/scopes/scope_settings.xml
+.idea/vcs.xml
+.idea/misc.xml
+
+# ignore webstorm Atlassian plugin config file
+atlassian-ide-plugin.xml
+
+
