@@ -1,0 +1,37 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+
+<polymer-element name="my-element">
+  <template>
+  	<link rel="stylesheet" href="my-element.css">
+	<div class="text-color">
+		<span>Hello from <b>my-element</b>. This is my Shadow DOM.</span>
+	    <p id="el">Not ready...</p>
+	</div> 
+  </template>
+  <script>
+  	Polymer('my-element',{
+  		owner: "my-element",
+  		created: function() {
+  			console.info("created, time:%s", new Date());
+  		},
+		ready: function() {
+			console.info("ready, time:%s", new Date());
+			this.$.el.textContent = this.owner + " is ready!";
+		},
+		attached: function () {
+			console.info("attached, time:%s", new Date());
+		},
+		domReady: function() {
+			console.info("domReady, time:%s", new Date());
+		},
+		detached: function() {
+			console.info("detached, time:%s", new Date());
+		},
+		attributeChanged: function(attrName, oldVal, newVal) {
+			console.info("attributeChanged, time:%s", new Date());
+			//var newVal = this.getAttribute(attrName);
+		    console.log(attrName, 'old: ' + oldVal, 'new:', newVal);
+		}
+  	});
+  </script>
+</polymer-element>

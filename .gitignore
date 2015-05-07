@@ -22,4 +22,6 @@
 # ignore webstorm Atlassian plugin config file
 atlassian-ide-plugin.xml
 
+# ignore bower components
+bower_components/*
 
