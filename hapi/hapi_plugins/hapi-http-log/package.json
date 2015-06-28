@@ -1,0 +1,22 @@
+{
+  "name": "hapi-http-log",
+  "version": "0.0.1",
+  "description": "Log all HTTP request, response information to console or mongodb",
+  "keywords": [
+    "hapi",
+    "log",
+    "http"
+  ],
+  "homepage":"http://shaoke.me",
+  "license":"MIT",
+  "author":{
+    "name": "Shaoke Xu",
+    "email": "shaokexu@gmail.com"
+  },
+  "dependencies":{
+    "mongoose": "^4.0.6"
+  },
+  "devDependencies":{
+
+  }
+}

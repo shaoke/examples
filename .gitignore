@@ -7,7 +7,7 @@
 # Pods/
 
 # ignore webstorm editor project files
-.idea/*
+**/.idea/*
 .idea/**/*
 .idea/encodings.xml
 .idea/examples.iml
@@ -24,4 +24,7 @@ atlassian-ide-plugin.xml
 
 # ignore bower components
 bower_components/*
+
+# ignore node_modules
+node_modules
 
