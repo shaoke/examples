@@ -1,0 +1,26 @@
+<!doctype>
+<html>
+    <head>
+        <script src="http://code.jquery.com/jquery-1.11.3.js"></script>
+    </head>
+    <body>
+        <input type="button" value="Test" onClick="clickMe()">
+        <script>
+
+            function clickMe(){
+                console.log("test");
+                $.ajax({
+                    url:'/whoami'
+                }).done(function(data){
+                    console.log("whoami, success: %o", data);
+                }).fail(function(error){
+                    console.log("whoami, error: %o", error);
+                });
+            }
+
+            $('document').ready(function(){
+                console.log("onReady");
+            });
+        </script>
+    </body>
+</html>
