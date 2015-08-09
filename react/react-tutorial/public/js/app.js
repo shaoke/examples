@@ -1,5 +1,5 @@
 var data = {
-        list: [
+        data: [
             {
                 author: "Seabreeze",
                 comment: "Depends on the woman, I suppose. Some can pull it off with style, others just look dowdy. Accessories are often what makes the difference, and it sounds like you have a flair for accessorizing."
@@ -13,6 +13,6 @@ var data = {
     };
 
 React.render(
-    <CommentBox comments={data}/>,
+    <CommentBox url="comments.json"/>,
     document.getElementById('content')
 );

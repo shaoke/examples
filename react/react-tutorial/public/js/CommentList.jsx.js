@@ -4,7 +4,7 @@
 var CommentList = React.createClass({
     render: function () {
         console.log(this.props.comments);
-        var commentsHTML = this.props.comments.list.map(function(data, index){
+        var commentsHTML = this.props.comments.map(function(data, index){
             return <Comment author={data.author} comment={data.comment} />
         });
 
