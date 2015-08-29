@@ -1,0 +1,19 @@
+{
+  "name": "swagger-mock-server",
+  "version": "1.0.0",
+  "description": "This is used for create a swagger mock server",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "swagger",
+    "mock",
+    "server"
+  ],
+  "author": "Shaokexu (shaokexu@gmail.com)",
+  "license": "MIT",
+  "dependencies":{
+    "swagger-server": ""
+  }
+}

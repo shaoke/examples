@@ -1,0 +1,1097 @@
+swagger: '2.0'
+info:
+  title: Domain Server API
+  version: '1.0'
+produces:
+  - application/json
+basePath: /v1
+host: localhost:3000
+consumes:
+  - application/json
+produces:
+  - application/json
+paths:
+  /version:
+    get:
+      summary: Gets the Domain Server version
+      responses:
+        '200':
+          description: Domain Server version
+          schema:
+            $ref: '#/definitions/Version'
+        '500':
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /login:
+    post:
+      summary: Log-in for an user
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - name: username
+          in: formData
+          description: The username for login
+          required: true
+          type: string
+        - name: password
+          in: formData
+          description: The password for login in clear text
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Successful login
+          schema:
+            $ref: '#/definitions/LoggedInResponse'
+        '401':
+          description: Login failed
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /logout:
+    get:
+      summary: Logs out an user
+      description: Logs out an user
+      parameters:
+        - name: X-Atmosphere-Remote-User
+          in: header
+          description: userName to be logged out
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Successful logout
+          schema:
+            $ref: '#/definitions/Success'
+        '404':
+          description: User does not exist
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /users:
+    post:
+      summary: Registers a new user
+      description: Registers a new user
+      parameters:
+        - name: user
+          in: body
+          description: New user to register
+          required: true
+          schema:
+            $ref: '#/definitions/NewUser'
+        - name: registerWithTA
+          in: query
+          description: Specify false if need to register only in Troposphere Database
+          required: false
+          type: boolean
+          default: true
+        - name: resumeURL
+          in: query
+          description: "resumeURL to be passed to TIBCO Accounts, this parameter is needed only when registerWithTA parameter's value is true"
+          required: false
+          type: string
+          default: ''
+      responses:
+        '200':
+          description: User successfully registered.
+          schema:
+            $ref: '#/definitions/NewUserResponse'
+        '422':
+          description: Can not process the request to register new user
+          schema:
+            $ref: '#/definitions/Error'
+  '/users/{userName}':
+    get:
+      summary: Fetches profile information of a user already registered
+      description: Fetches profile information of a user already registered
+      parameters:
+        - name: userName
+          in: path
+          description: Email of the user
+          required: true
+          type: string
+      responses:
+        '200':
+          description: User profile successfully fetched.
+          schema:
+            $ref: '#/definitions/GetUserResponse'
+        '400':
+          description: Bad request to activate the user
+          schema:
+            $ref: '#/definitions/Error'
+        '404':
+          description: User not found
+          schema:
+            $ref: '#/definitions/Error'
+        '422':
+          description: Can not process the request to fetch registered user information.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      summary: Updates attributes of a user already registered
+      description: Updates attributes of a user already registered
+      parameters:
+        - name: userName
+          in: path
+          description: Email of the user
+          required: true
+          type: string
+        - name: user
+          in: body
+          description: User to be updated
+          required: true
+          schema:
+            $ref: '#/definitions/UpdateUser'
+      responses:
+        '200':
+          description: User profile successfully updated.
+          schema:
+            $ref: '#/definitions/UpdateUserResponse'
+        '404':
+          description: User not found
+          schema:
+            $ref: '#/definitions/Error'
+        '422':
+          description: Can not process the request to update registered user
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /sandboxes:
+    post:
+      summary: Create a sandbox
+      description: Create a sandbox
+      consumes:
+        - application/x-www-form-urlencoded
+      parameters:
+        - name: name
+          in: formData
+          description: Name of the sandbox
+          required: true
+          type: string
+        - name: displayName
+          in: formData
+          description: Display name of the sandbox
+          required: true
+          type: string
+        - name: description
+          in: formData
+          description: Description of the sandbox
+          required: false
+          type: string
+        - name: X-Atmosphere-Remote-User
+          in: header
+          description: current authenticated user
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Sandbox Successfully Created.
+          schema:
+            $ref: '#/definitions/Sandbox'
+        '400':
+          description: Sandbox already exists
+          schema:
+            $ref: '#/definitions/Error'
+        '422':
+          description: Can not process the request to create the sandbox
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      summary: Delete multiple sandboxes using provided sandboxIds for the authenticated user
+      description: Delete multiple sandboxes using provided sandboxIds for the authenticated user
+      parameters:
+        - name: sandboxId
+          in: query
+          description: SandboxIds of the sandboxes
+          required: true
+          type: string
+          collectionFormat: multi
+        - name: X-Atmosphere-Remote-User
+          in: header
+          description: current authenticated user
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Sandboxes Successfully Deleted.
+          schema:
+            $ref: '#/definitions/SuccessDeleteResponse'
+        '404':
+          description: No sandboxes were found
+          schema:
+            $ref: '#/definitions/Error'
+        '422':
+          description: Can not process the request to delete the sandboxes
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    get:
+      summary: "Get the sandboxes for the provided userName if userName parameter is present else return all the sandboxes from the authenticated user's organization"
+      description: "Get the sandboxes for the provided userName if userName parameter is present else return all the sandboxes from the authenticated user's organization"
+      parameters:
+        - name: X-Atmosphere-Remote-User
+          in: header
+          description: current authenticated user
+          required: true
+          type: string
+        - name: userName
+          in: query
+          description: Username whose sandboxes you want
+          required: false
+          type: string
+      responses:
+        '200':
+          description: Sandboxes successfully fetched.
+          schema:
+            $ref: '#/definitions/SandboxBulkGetResponse'
+        '404':
+          description: No Sandboxes were found
+          schema:
+            $ref: '#/definitions/Error'
+        '422':
+          description: Can not process the request to fetch sandboxes.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  '/sandboxes/{sandboxId}':
+    put:
+      summary: Update a sandbox using the provided sandboxId for the authenticated user
+      description: Update a sandbox using the provided sandboxId for the authenticated user
+      parameters:
+        - name: sandboxId
+          in: path
+          description: SandboxId of the sandbox
+          required: true
+          type: string
+        - name: X-Atmosphere-Remote-User
+          in: header
+          description: current authenticated user
+          required: true
+          type: string
+        - name: sandbox
+          in: body
+          description: SandboxBean to be updated
+          required: true
+          schema:
+            $ref: '#/definitions/Sandbox'
+      responses:
+        '200':
+          description: Sandbox Successfully Updated.
+          schema:
+            $ref: '#/definitions/Success'
+        '404':
+          description: "Sandbox doesn't exist"
+          schema:
+            $ref: '#/definitions/Error'
+        '422':
+          description: Can not process the request to update the sandbox
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      summary: Delete a sandbox using the provided sandboxId for the authenticated user
+      description: Delete a sandbox using the provided sandboxId for the authenticated user
+      parameters:
+        - name: sandboxId
+          in: path
+          description: SandboxId of the sandbox
+          required: true
+          type: string
+        - name: X-Atmosphere-Remote-User
+          in: header
+          description: current authenticated user
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Sandbox Successfully Deleted.
+          schema:
+            $ref: '#/definitions/Success'
+        '404':
+          description: "Sandbox doesn't exist"
+          schema:
+            $ref: '#/definitions/Error'
+        '422':
+          description: Can not process the request to delete the sandbox
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    get:
+      summary: Get the sandbox using the provided sandboxId for the authenticated user
+      description: Get the sandbox using the provided sandboxId for the authenticated user
+      parameters:
+        - name: sandboxId
+          in: path
+          description: SandboxId of the sandbox
+          required: true
+          type: string
+        - name: X-Atmosphere-Remote-User
+          in: header
+          description: current authenticated user
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Sandbox successfully fetched.
+          schema:
+            $ref: '#/definitions/Sandbox'
+        '404':
+          description: Sandbox not found
+          schema:
+            $ref: '#/definitions/Error'
+        '422':
+          description: Can not process the request to fetch sandbox.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  '/sandboxes/{sandboxName}/applications':
+    post:
+      summary: "Create an application in authenticated user's sandbox"
+      description: "Create an application in authenticated user's sandbox"
+      parameters:
+        - name: name
+          in: formData
+          description: Name of the application
+          required: true
+          type: string
+        - name: version
+          in: formData
+          description: Version of the application
+          required: true
+          type: string
+        - name: description
+          in: formData
+          description: Description of the application
+          required: false
+          type: string
+        - name: X-Atmosphere-Remote-User
+          in: header
+          description: Current authenticated user creating the application
+          required: true
+          type: string
+        - name: sandboxName
+          in: path
+          description: sandboxName of the sandbox where the application is getting created
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Application Successfully Created.
+          schema:
+            $ref: '#/definitions/Application'
+        '400':
+          description: Application already exists
+          schema:
+            $ref: '#/definitions/Error'
+        '422':
+          description: Can not process the request to create an application
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  '/sandboxes/{sandboxName}/applications/{applicationName}':
+    get:
+      summary: Get the application for the provided application name in the provided sandboxName for the authenticated user
+      description: Get the application for the provided application name in the provided sandboxName for the authenticated user
+      parameters:
+        - name: sandboxName
+          in: path
+          description: sandboxName of the sandbox
+          required: true
+          type: string
+        - name: applicationName
+          in: path
+          description: application name of the application to fetch
+          required: true
+          type: string
+        - name: X-Atmosphere-Remote-User
+          in: header
+          description: current authenticated user
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Application successfully fetched.
+          schema:
+            $ref: '#/definitions/Application'
+        '404':
+          description: Application not found
+          schema:
+            $ref: '#/definitions/Error'
+        '422':
+          description: Can not process the request to fetch Application.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      summary: Delete the application for the provided application name in the provided sandboxName for the authenticated user
+      description: Delete the application for the provided application name in the provided sandboxName for the authenticated user
+      parameters:
+        - name: sandboxName
+          in: path
+          description: sandboxName of the sandbox
+          required: true
+          type: string
+        - name: applicationName
+          in: path
+          description: application name of the application to fetch
+          required: true
+          type: string
+        - name: X-Atmosphere-Remote-User
+          in: header
+          description: current authenticated user
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Application successfully deleted.
+          schema:
+            $ref: '#/definitions/Success'
+        '404':
+          description: Application not found
+          schema:
+            $ref: '#/definitions/Error'
+        '422':
+          description: Can not process the request to delete Application.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    put:
+      summary: Update an application for the provided application name in the provided sandboxName for the authenticated user
+      description: Update an application for the provided application name in the provided sandboxName for the authenticated user
+      parameters:
+        - name: applicationName
+          in: path
+          description: applicationName of the Application
+          required: true
+          type: string
+        - name: sandboxName
+          in: path
+          description: sandboxName where the application recides
+          required: true
+          type: string
+        - name: application
+          in: body
+          description: ApplicationBean to be updated
+          required: true
+          schema:
+            $ref: '#/definitions/Application'
+        - name: X-Atmosphere-Remote-User
+          in: header
+          description: Current authenticated user updating the application
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Application Successfully Updated.
+          schema:
+            $ref: '#/definitions/Success'
+        '404':
+          description: "Application doesn't exist"
+          schema:
+            $ref: '#/definitions/Error'
+        '422':
+          description: Can not process the request to update the application
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  /applications:
+    post:
+      summary: "Create an application in authenticated user's sandbox for the provided sandboxId"
+      description: "Create an application in authenticated user's sandbox for the provided sandboxId"
+      parameters:
+        - name: name
+          in: formData
+          description: Name of the application
+          required: true
+          type: string
+        - name: version
+          in: formData
+          description: Version of the application
+          required: true
+          type: string
+        - name: description
+          in: formData
+          description: Description of the application
+          required: false
+          type: string
+        - name: sandboxId
+          in: formData
+          description: sandboxId of the associated sandbox for the application
+          required: true
+          type: string
+        - name: X-Atmosphere-Remote-User
+          in: header
+          description: Current authenticated user creating the application
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Application Successfully Created.
+          schema:
+            $ref: '#/definitions/Application'
+        '400':
+          description: Application already exists
+          schema:
+            $ref: '#/definitions/Error'
+        '422':
+          description: Can not process the request to create an application
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      summary: Delete multiple applications from the sandboxes of the authenticated user
+      description: Delete multiple applications from the sandboxes of the authenticated user
+      parameters:
+        - name: applicationId
+          in: query
+          description: applicationIds of the Applications
+          required: true
+          type: string
+          collectionFormat: multi
+        - name: X-Atmosphere-Remote-User
+          in: header
+          description: Current authenticated user deleting the application
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Applications Successfully Deleted.
+          schema:
+            $ref: '#/definitions/SuccessDeleteResponse'
+        '404':
+          description: No applications were found
+          schema:
+            $ref: '#/definitions/Error'
+        '422':
+          description: Can not process the request to delete the applications
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    get:
+      summary: Get the applications from the provided sandboxId of the authenticated user
+      description: Get the applications from the provided sandboxId of the authenticated user
+      parameters:
+        - name: sandboxId
+          in: query
+          description: sandboxId whose applications you want
+          required: true
+          type: string
+        - name: X-Atmosphere-Remote-User
+          in: header
+          description: Current authenticated user
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Applications successfully fetched.
+          schema:
+            $ref: '#/definitions/ApplicationBulkGetResponse'
+        '404':
+          description: No applications were found
+          schema:
+            $ref: '#/definitions/Error'
+        '422':
+          description: Can not process the request to fetch applications.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+  '/applications/{applicationId}':
+    put:
+      summary: "Update an application using applicationId which exists in authenticated user's one of the sandboxes"
+      description: "Update an application using applicationId which exists in authenticated user's one of the sandboxes"
+      parameters:
+        - name: applicationId
+          in: path
+          description: applicationId of the Application
+          required: true
+          type: string
+        - name: application
+          in: body
+          description: ApplicationBean to be updated
+          required: true
+          schema:
+            $ref: '#/definitions/Application'
+        - name: X-Atmosphere-Remote-User
+          in: header
+          description: Current authenticated user updating the application
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Application Successfully Updated.
+          schema:
+            $ref: '#/definitions/Success'
+        '404':
+          description: "Application doesn't exist"
+          schema:
+            $ref: '#/definitions/Error'
+        '422':
+          description: Can not process the request to update the application
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    delete:
+      summary: "Delete an application using applicationId from authenticated user's one of the sandbox"
+      description: "Delete an application using applicationId from authenticated user's one of the sandbox"
+      parameters:
+        - name: applicationId
+          in: path
+          description: applicationId of the Application
+          required: true
+          type: string
+        - name: X-Atmosphere-Remote-User
+          in: header
+          description: Current authenticated user deleting the application
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Application Successfully Deleted.
+          schema:
+            $ref: '#/definitions/Success'
+        '404':
+          description: "Application doesn't exist"
+          schema:
+            $ref: '#/definitions/Error'
+        '422':
+          description: Can not process the request to delete the application
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+    get:
+      summary: "Get the application for the provided applicationId from the authenticated user's one of the sandbox"
+      description: "Get the application for the provided applicationId from the authenticated user's one of the sandbox"
+      parameters:
+        - name: applicationId
+          in: path
+          description: applicationId of the Application
+          required: true
+          type: string
+        - name: X-Atmosphere-Remote-User
+          in: header
+          description: Current authenticated user
+          required: true
+          type: string
+      responses:
+        '200':
+          description: Application successfully fetched.
+          schema:
+            $ref: '#/definitions/Application'
+        '404':
+          description: Application not found
+          schema:
+            $ref: '#/definitions/Error'
+        '422':
+          description: Can not process the request to fetch application.
+          schema:
+            $ref: '#/definitions/Error'
+        '500':
+          description: Unexpected error
+          schema:
+            $ref: '#/definitions/Error'
+definitions:
+  Version:
+    properties:
+      version:
+        type: string
+        description: Domain Server Version
+  LoggedInResponse:
+    properties:
+      defaultSandboxName:
+        type: string
+        description: Default sandbox name of the user
+      sandboxNames:
+        type: array
+        description: List of sandbox names of the user
+        items:
+            type: string
+            description: Sandbox names
+  Success:
+    properties:
+      message:
+        type: string
+        description: Success message
+  Error:
+    properties:
+      errorCode:
+        type: string
+        description: Error code
+      errorMsg:
+        type: string
+        description: Error message
+  NewUser:
+    required:
+      - firstName
+      - lastName
+      - userName
+    properties:
+      firstName:
+        type: string
+        description: First name of the user
+      lastName:
+        type: string
+        description: Last name of the user
+      userName:
+        type: string
+        description: Email of the user
+      companyName:
+        type: string
+        description: Company name of the user
+      phone:
+        type: string
+        description: Phone number of the user
+      status:
+        type: boolean
+        description: Status of the user
+      userId:
+        type: string
+        description: UserId of the user as generated by TIBCO Account
+      defaultSandboxName:
+        type: string
+        description: Default sandbox name of the user
+      sandboxIds:
+        type: array
+        description: List of sandbox Ids for the sandboxes of the user
+        items:
+            type: string
+            description: Sandbox Ids
+  NewUserResponse:
+    required:
+      - firstName
+      - lastName
+      - userName
+      - companyName
+      - phone
+      - status
+      - userId
+      - defaultSandboxName
+      - sandboxIds
+      - organizationId
+      - lastUpdatedTime
+    properties:
+      firstName:
+        type: string
+        description: First name of the user
+      lastName:
+        type: string
+        description: Last name of the user
+      userName:
+        type: string
+        description: Email of the user
+      companyName:
+        type: string
+        description: Company name of the user
+      phone:
+        type: string
+        description: Phone number of the user
+      status:
+        type: boolean
+        description: Status of the user
+      userId:
+        type: string
+        description: UserId of the user as generated by TIBCO Account
+      defaultSandboxName:
+        type: string
+        description: Default sandbox name of the user
+      sandboxIds:
+        type: array
+        description: List of sandbox Ids for the sandboxes of the user
+        items:
+            type: string
+            description: Sandbox Ids
+      organizationId:
+        type: string
+        description: "Unique ID of the user's Organization"
+      lastUpdatedTime:
+        type: integer
+        format: int64
+        description: Last updated time for the sandbox
+  GetUserResponse:
+    required:
+      - firstName
+      - lastName
+      - userName
+      - companyName
+      - phone
+      - status
+      - userId
+      - defaultSandboxName
+      - sandboxIds
+      - organizationId
+      - lastUpdatedTime
+    properties:
+      firstName:
+        type: string
+        description: First name of the user
+      lastName:
+        type: string
+        description: Last name of the user
+      userName:
+        type: string
+        description: Email of the user
+      companyName:
+        type: string
+        description: Company name of the user
+      phone:
+        type: string
+        description: Phone number of the user
+      status:
+        type: boolean
+        description: Status of the user
+      userId:
+        type: string
+        description: UserId of the user as generated by TIBCO Account
+      defaultSandboxName:
+        type: string
+        description: Default sandbox name of the user
+      sandboxIds:
+        type: array
+        description: List of sandbox Ids for the sandboxes of the user
+        items:
+            type: string
+            description: Sandbox Ids
+      organizationId:
+        type: string
+        description: "Unique ID of the user's Organization"
+      lastUpdatedTime:
+        type: integer
+        format: int64
+        description: Last updated time for the sandbox
+  UpdateUser:
+    required:
+      - firstName
+      - lastName
+      - userName
+      - companyName
+      - phone
+      - status
+      - userId
+      - defaultSandboxName
+      - sandboxIds
+    properties:
+      firstName:
+        type: string
+        description: First name of the user
+      lastName:
+        type: string
+        description: Last name of the user
+      userName:
+        type: string
+        description: Email of the user
+      companyName:
+        type: string
+        description: Company name of the user
+      phone:
+        type: string
+        description: Phone number of the user
+      status:
+        type: boolean
+        description: Status of the user
+      userId:
+        type: string
+        description: UserId of the user as generated by TIBCO Account
+      defaultSandboxName:
+        type: string
+        description: Default sandbox name of the user
+      sandboxIds:
+        type: array
+        description: List of sandbox Ids for the sandboxes of the user
+        items:
+            type: string
+            description: Sandbox Ids
+  UpdateUserResponse:
+    required:
+      - userName
+      - status
+    properties:
+      userName:
+        type: string
+        description: Email of the user
+      status:
+        type: boolean
+        description: Status of the user
+  Sandbox:
+    required:
+      - id
+      - organizationId
+      - sandboxName
+      - displayName
+      - description
+      - createdBy
+      - usedBy
+      - applicationIds
+      - lastUpdatedTime
+      - lastModifiedBy
+    properties:
+      id:
+        type: string
+        description: Unique ID of the Sandbox
+      organizationId:
+        type: string
+        description: "Unique ID of the Sandbox's Organization"
+      sandboxName:
+        type: string
+        description: Sandbox Name
+      displayName:
+        type: string
+        description: Display name of the sandbox
+      description:
+        type: string
+        description: Sandbox description
+      createdBy:
+        type: string
+        description: UserName who has created the sandbox
+      usedBy:
+        type: array
+        description: Users using the sandbox
+        items:
+            type: string
+            description: Usernames using the sandbox
+      applicationIds:
+        type: array
+        description: Ids of the applications in the sandbox
+        items:
+            type: string
+            description: Application Id
+      lastUpdatedTime:
+        type: integer
+        format: int64
+        description: Last updated time for the sandbox
+      lastModifiedBy:
+        type: string
+        description: User who last modified the sandbox
+  SandboxBulkGetResponse:
+    required:
+      - sandboxes
+    properties:
+      sandboxes:
+        type: array
+        description: Sandboxes
+        items:
+            $ref: '#/definitions/Sandbox'
+      operationWarning:
+        type: string
+        description: Optional warning message in case of partial success
+  SuccessDeleteResponse:
+    required:
+      - message
+    properties:
+      message:
+        type: string
+        description: Success message
+      operationWarning:
+        type: string
+        description: Optional warning message in case of partial success
+  Application:
+    required:
+      - id
+      - applicationName
+      - description
+      - version
+      - userName
+      - sandboxId
+      - instanceCount
+      - lastUpdatedTime
+      - lastModifiedBy
+    properties:
+      id:
+        type: string
+        description: Unique ID of the Application
+      applicationName:
+        type: string
+        description: Application Name
+      description:
+        type: string
+        description: Application description
+      version:
+        type: string
+        description: Application version
+      userName:
+        type: string
+        description: UserName who has created the application
+      sandboxId:
+        type: string
+        description: sandboxId of the sandbox with which this application is associated
+      instanceCount:
+        type: integer
+        format: int32
+        description: Total count of application instances
+      lastUpdatedTime:
+        type: integer
+        format: int64
+        description: Last updated time for the Application
+      lastModifiedBy:
+        type: string
+        description: User who last modified the application
+  ApplicationBulkGetResponse:
+    required:
+      - applications
+    properties:
+      applications:
+        type: array
+        description: Applications
+        items:
+            $ref: '#/definitions/Application'
+      operationWarning:
+        type: string
+        description: Optional warning message in case of partial success
