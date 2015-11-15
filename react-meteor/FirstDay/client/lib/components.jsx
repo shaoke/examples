@@ -1,3 +1,3 @@
 (function(){
-    window.App = {};
+    window.Components = {};
 })();

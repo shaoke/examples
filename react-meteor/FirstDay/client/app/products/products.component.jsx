@@ -4,7 +4,10 @@
         displayName: "Products",
         render: function () {
             return (
-                <Components.FilterProducts></Components.FilterProducts>
+                <div>
+                    <Components.FilterProducts></Components.FilterProducts>
+                    <Components.Hello></Components.Hello>
+                </div>
             );
         }
     });
