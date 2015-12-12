@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="http://code.jquery.com/jquery-1.11.3.min.js"></script>
+</head>
+<body>
+
+<button id="push">Push</button>
+
+<script>
+    $(document).ready(function(){
+        var pushQueue = [];
+        function showConfirm(){
+            if(pushQueue.length){
+                return true;
+            }
+            return false;
+        }
+        $("#push").bind("click", function(){
+            pushQueue.push(new Date().getTime());
+            console.log("queue length: %s", pushQueue.length);
+            update();
+            setTimeout(function(){
+                pushQueue.pop();
+                console.log("queue length: %s", pushQueue.length);
+                update();
+            }, 2000);
+        });
+
+        function update(){
+            if(pushQueue.length){
+                window.onbeforeunload = function(){
+                    return "Queue isn't empty!";
+                }
+            }else{
+                window.onbeforeunload = null;
+            }
+        }
+
+
+    });
+</script>
+
+</body>
+</html>
