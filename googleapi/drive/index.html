@@ -1,0 +1,54 @@
+<html>
+  <head>
+    <script type="text/javascript">
+      // Put your Client ID
+      // How to create a Client ID:
+      // Go to https://console.developers.google.com/projectselector/apis/credentials, create a credential for 'oauth'
+      var CLIENT_ID = '602482141964-kagakatff11t9figarh76bhbttrhm1v8.apps.googleusercontent.com';
+      var SCOPES = [
+          'https://www.googleapis.com/auth/drive.file',
+          'email',
+          'profile',
+          // Add other scopes needed by your application.
+        ];
+
+      /**
+       * Called when the client library is loaded.
+       */
+      function handleClientLoad() {
+        checkAuth();
+      }
+
+      /**
+       * Check if the current user has authorized the application.
+       */
+      function checkAuth() {
+        gapi.auth.authorize(
+            {'client_id': CLIENT_ID, 'scope': SCOPES, 'immediate': true},
+            handleAuthResult);
+      }
+
+      /**
+       * Called when authorization server replies.
+       *
+       * @param {Object} authResult Authorization result. You can get more information about this object from https://developers.google.com/api-client-library/javascript/reference/referencedocs#OAuth20TokenObject
+       */
+      function handleAuthResult(authResult) {
+        if (authResult&&authResult.access_token) {
+          // Access token has been successfully retrieved, requests can be sent to the API
+          console.log("You get access token: %s", authResult.access_token);
+          document.body.innerHTML = "<p><strong>Token:</strong>"+authResult.access_token+"</p>";
+        } else {
+          // No access token could be retrieved, force the authorization flow.
+          gapi.auth.authorize(
+              {'client_id': CLIENT_ID, 'scope': SCOPES, 'immediate': false},
+              handleAuthResult);
+        }
+      }
+    </script>
+    <script type="text/javascript" src="https://apis.google.com/js/client.js?onload=handleClientLoad"></script>
+  </head>
+  <body>
+    <!-- YOUR CONTENT -->
+  </body>
+</html>
