@@ -1,0 +1,12 @@
+{
+  "name": "requirejs-first-example",
+  "version": "0.1.0",
+  "description": "RequireJS First Example",
+  "scripts": {
+    "start": "npm run dev",
+    "dev": "lite-server"
+  },
+  "devDependencies": {
+    "lite-server": "2.2.0"
+  }
+}
