@@ -1,0 +1,149 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>KnockoutJS - Lists and Collections</title>
+  <script src="./knockout-3.4.0.js" type="text/javascript"></script>
+</head>
+
+<body>
+
+  <h2>Your seat reservations</h2>
+
+  <label>Passenger Name:</label>
+  <input data-bind="value: passengerName" />
+  <br/>
+  <label>Meal:</label>
+  <select data-bind="
+                    options: $root.availableMeals,
+                    optionsText: 'mealName',
+                    value: selectedMeal,
+                    optionsCaption: 'Please select meal...'
+                    ">
+  </select>
+  <br/>
+  <button data-bind="click: addSeat">Reserve another seat</button>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Passenger name</th>
+        <th>Meal</th>
+        <th>Surcharge</th>
+        <th></th>
+      </tr>
+    </thead>
+    <!-- Todo: Generate table body -->
+    <tbody data-bind="foreach: seats">
+      <tr>
+        <td>
+          <input data-bind="value: name" />
+        </td>
+        <td>
+          <select data-bind="options: $root.availableMeals, value: meal, optionsText: 'mealName'"></select>
+        </td>
+        <td data-bind="text: formattedPrice"></td>
+        <td><a href="#" data-bind="click: $root.removeSeat">Remove</a></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <label>Total summary:</label>
+  <span data-bind="text: totalPrice"></span>
+
+  <hr/>
+  <p>This is for validation</p>
+  <ul data-bind="foreach:seats">
+    <li>
+      <span data-bind="text: name"></span>
+      <span data-bind="text: meal().mealName"></span>
+      <span data-bind="text: meal().price"></span>
+    </li>
+  </ul>
+
+  <script type="text/javascript">
+    // Class to represent a row in the seat reservations grid
+    function SeatReservation(name, initialMeal) {
+      var self = this;
+      self.name = name;
+      self.meal = ko.observable(initialMeal);
+      self.formattedPrice = ko.computed(function() {
+        var price = self.meal().price;
+        return price ? "$" + price.toFixed(2) : "0";
+      });
+    }
+
+    // Overall viewmodel for this screen, along with initial state
+    function ReservationsViewModel() {
+      var self = this;
+
+      self.passengerName = "";
+
+      self.selectedMeal = null;
+
+      // Non-editable catalog data - would come from the server
+      self.availableMeals = [{
+        mealName: "Standard (sandwich)",
+        price: 0
+      }, {
+        mealName: "Premium (lobster)",
+        price: 34.95
+      }, {
+        mealName: "Ultimate (whole zebra)",
+        price: 290
+      }];
+
+      // Editable data
+      self.seats = ko.observableArray([
+        new SeatReservation("Steve", self.availableMeals[0]),
+        new SeatReservation("Bert", self.availableMeals[1])
+      ]);
+
+      self.totalPrice = ko.computed(function() {
+        var total = 0;
+        var arr = self.seats();
+        for (var i = 0; i < arr.length; i++) {
+          var item = arr[i];
+          var price = item.meal().price * 1;
+          //console.log(price);
+          if (price != NaN) {
+            total += price;
+          }
+
+        }
+
+        return total.toFixed(2);
+      })
+
+      self.removeSeat = function() {
+        //console.log(this);
+        self.seats.remove(this)
+      }
+
+      self.addSeat = function() {
+        //        var selectedMeal = self.selectedMeal();
+        //        var pssagerName = self.passengerName;
+        // user must type passenger name
+        if (!self.passengerName || self.passengerName.length == 0) {
+          alert("Please input passenger name!");
+          return;
+        }
+
+        // user must select meal
+        if (!self.selectedMeal || !self.selectedMeal.mealName) {
+          alert("Please select meal!");
+          return;
+        }
+
+        console.log(self.selectedMeal);
+        console.log(self.seats.push(new SeatReservation(self.passengerName, self.selectedMeal)))
+      }
+    }
+
+    ko.applyBindings(new ReservationsViewModel());
+  </script>
+
+
+</body>
+
+</html>
