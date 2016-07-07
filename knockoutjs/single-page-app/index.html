@@ -1,0 +1,94 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>KnockoutJS-Single Page Application</title>
+  <link href="./app.css" rel="stylesheet">
+  <script src="./jquery-3.0.0.min.js" type="text/javascript"></script>
+  <script src="https://rawgit.com/flatiron/director/master/build/director.min.js" type="text/javascript"></script>
+  <script src="./knockout-3.4.0.js" type="text/javascript"></script>
+</head>
+
+<body>
+
+  <section id="main">
+    <div class="col-1">
+      <ul data-bind="foreach: folders">
+        <li data-bind="text: $data, css:{selected: $data == $root.choosedFolderId()}, click: $root.selectFolder"></li>
+      </ul>
+    </div>
+    <div class="col-4">
+      <div data-bind="foreach: $root.choosedFolderMails()">
+        <section class="mail-summary" data-bind="click: $root.goToMail, css:{'selected-mail': $data.id == $root.choosedMailId()}">
+          <div class="col-7" data-bind="text:from"></div>
+          <div class="col-3" data-bind="text:date"></div>
+          <div class="col-10 mail-subject" data-bind="text: subject"></div>
+        </section>
+      </div>
+    </div>
+    <div class="col-5" data-bind="with: choosedMailDetail">
+      <div data-bind="html: messageContent">
+      </div>
+    </div>
+  </section>
+
+  <script type="text/javascript">
+    function WebmailViewModel() {
+      var self = this;
+      // data
+      self.folders = ['Inbox', 'Archive', 'Sent', 'Spam'];
+      self.choosedFolderId = ko.observable();
+      self.choosedMailId = ko.observable();
+      self.choosedFolderMails = ko.observable();
+      self.choosedMailDetail = ko.observable();
+
+      // behavior
+      self.selectFolder = function(item) {
+        //console.log(arguments);
+        // console.log(item);
+        self.choosedFolderId(item);
+        $.get('http://cors.shaoke.me/mail?_target_=http://learn.knockoutjs.com', {
+          folder: self.choosedFolderId()
+        }, function(data) {
+          data = JSON.parse(data);
+          console.log(data);
+
+          if (data && data.mails) {
+            self.choosedFolderMails(data.mails);
+          }
+        })
+      }
+
+      self.goToMail = function(item){
+        // console.log(item);
+        self.choosedMailId(item.id);
+        $.get('http://cors.shaoke.me/mail?_target_=http://learn.knockoutjs.com', {
+          mailId: item.id
+        }, function(data) {
+          data = JSON.parse(data);
+          // console.log(data);
+          self.choosedMailDetail(data);
+        })
+      }
+
+      // default open
+      // self.selectFolder("Inbox")
+
+    }
+    var webmailModel = new WebmailViewModel();
+
+    ko.applyBindings(webmailModel, $("#main")[0])
+
+    var router = new Router();
+    router.param("folderId", /([\w]+)/);
+    router.param("mailId", /([\\d]+)/);
+
+    router.on('/index', function(folderId){
+      console.log(folderId);
+      webmailModel.selectFolder(folderId);
+    })
+
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,68 @@
+.selected{
+  color: red;
+}
+
+.selected-mail{
+  color:red;
+}
+
+.mail-summary{
+  margin: 10px 0;
+  width: 100%;
+  display: inline-block;
+}
+
+.mail-subject{
+  font-weight: bold;
+}
+
+.col-1{
+  float: left;
+  display: inline-block;
+  width:10%;
+}
+.col-2{
+  float: left;
+  display: inline-block;
+  width: 20%;
+}
+.col-3{
+  float: left;
+  display: inline-block;
+  width: 30%;
+}
+.col-4{
+  float: left;
+  display: inline-block;
+  width: 40%;
+}
+.col-5{
+  float: left;
+  display: inline-block;
+  width: 50%;
+}
+.col-6{
+  float: left;
+  display: inline-block;
+  width: 60%;
+}
+.col-7{
+  float: left;
+  display: inline-block;
+  width: 70%;
+}
+.col-8{
+  float: left;
+  display: inline-block;
+  width: 80%;
+}
+.col-9{
+  float: left;
+  display: inline-block;
+  width: 90%;
+}
+.col-10{
+  float: left;
+  display: inline-block;
+  width: 100%;
+}
