@@ -1,0 +1,13 @@
+{
+  "name": "babel-polyfill",
+  "version": "1.0.0",
+  "scripts": {
+    "start": "npm run lite",
+    "lite": "lite-server"
+  },
+  "license": "ISC",
+  "dependencies": {},
+  "devDependencies": {
+    "lite-server": "^2.2.2"
+  }
+}
