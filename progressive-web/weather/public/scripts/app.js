@@ -13,40 +13,6 @@
     daysOfWeek: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
   };
 
-
-  /*****************************************************************************
-   *
-   * Event listeners for UI elements
-   *
-   ****************************************************************************/
-
-  document.getElementById('butRefresh').addEventListener('click', function() {
-    // Refresh all of the forecasts
-    app.updateForecasts();
-  });
-
-  document.getElementById('butAdd').addEventListener('click', function() {
-    // Open/show the add new city dialog
-    app.toggleAddDialog(true);
-  });
-
-  document.getElementById('butAddCity').addEventListener('click', function() {
-    // Add the newly selected city
-    var select = document.getElementById('selectCityToAdd');
-    var selected = select.options[select.selectedIndex];
-    var key = selected.value;
-    var label = selected.textContent;
-    app.getForecast(key, label);
-    app.selectedCities.push({key: key, label: label});
-    app.toggleAddDialog(false);
-  });
-
-  document.getElementById('butAddCancel').addEventListener('click', function() {
-    // Close the add new city dialog
-    app.toggleAddDialog(false);
-  });
-
-
   /*****************************************************************************
    *
    * Methods to update/refresh the UI
@@ -113,6 +79,11 @@
     }
   };
 
+  app.saveSelectedCities = function(){
+    var selectedCities = JSON.stringify(app.selectedCities);
+
+    localStorage.selectedCities = selectedCities;
+  }
 
   /*****************************************************************************
    *
@@ -149,7 +120,7 @@
     });
   };
 
-  var fakeForecast = {
+  var initialWeatherForecast = {
     key: 'newyork',
     label: 'New York, NY',
     currently: {
@@ -177,5 +148,62 @@
   };
   // Uncomment the line below to test with the provided fake data
   // app.updateForecastCard(fakeForecast);
+
+  /*****************************************************************************
+   *
+   * Event listeners for UI elements
+   *
+   ****************************************************************************/
+
+  document.getElementById('butRefresh').addEventListener('click', function() {
+    // Refresh all of the forecasts
+    app.updateForecasts();
+  });
+
+  document.getElementById('butAdd').addEventListener('click', function() {
+    // Open/show the add new city dialog
+    app.toggleAddDialog(true);
+  });
+
+  document.getElementById('butAddCity').addEventListener('click', function() {
+    // Add the newly selected city
+    var select = document.getElementById('selectCityToAdd');
+    var selected = select.options[select.selectedIndex];
+    var key = selected.value;
+    var label = selected.textContent;
+    app.getForecast(key, label);
+    app.selectedCities.push({key: key, label: label});
+    app.saveSelectedCities();
+    app.toggleAddDialog(false);
+  });
+
+  document.getElementById('butAddCancel').addEventListener('click', function() {
+    // Close the add new city dialog
+    app.toggleAddDialog(false);
+  });
+
+  /*****************************************************************************
+   *
+   * Initial Application
+   *
+   ****************************************************************************/
+   app.selectedCities = localStorage.selectedCities;
+   if(app.selectedCities){
+     app.selectedCities = JSON.parse(app.selectedCities);
+     app.selectedCities.forEach(function(city){
+       app.getForecast(city.key, city.label);
+     });
+   }else {
+     app.updateForecastCard(initialWeatherForecast);
+     app.selectedCities = [
+       {
+         key: initialWeatherForecast.key,
+         label: initialWeatherForecast.label
+       }
+     ];
+
+     app.saveSelectedCities();
+   }
+
 
 })();
