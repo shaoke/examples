@@ -1,0 +1,15 @@
+{
+  "name": "progressive-web-weather",
+  "version": "0.0.1",
+  "description": "Example of Progressive Web Application",
+  "main":"server.js",
+  "scripts":{
+    "start": "node server.js"
+  },
+  "author": "Shaoke Xu<shaokexu@gmail.com>",
+  "license": "MIT",
+  "dependencies":{
+    "express": "^4.14.0",
+    "letsencrypt-express": "^1.1.5"
+  }
+}
