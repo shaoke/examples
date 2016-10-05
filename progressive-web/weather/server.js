@@ -2,7 +2,7 @@
 
 var LEX = require('letsencrypt-express').testing();
 
-var DOMAIN = 'example.shaoke.me';
+var DOMAIN = 'localhost';
 var EMAIL = 'shaokexu@gmail.com';
 
 var lex = LEX.create({

@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <title>Prevent backspace trigger page back</title>
+  <script type="text/javascript" src="https://code.jquery.com/jquery-3.1.0.js"></script>
+</head>
+
+<body>
+
+  <h2>Prevent backspace trigger page back</h2>
+
+  <form>
+    <input type="checkbox" id="my-checkbox" /><br>
+    <input type="text" name="usrname"><br>
+    <input type="text" name="usrname" disabled><br>
+    <input type="text" name="country" value="Norway" readonly><br>
+  </form>
+
+  <script>
+    $(document).unbind('keydown').bind('keydown', function(event){
+      var keyCode = event&&event.keyCode;
+      if(keyCode === 8){
+        var doPrevent = false;
+          var element = event&&(event.srcElement || event.target);
+          var tagName = element&&element.tagName||'';
+          tagName = tagName.toUpperCase();
+          console.group("type backsapce");
+          console.log("tagName: ", tagName);
+          // All available input type: http://www.w3schools.com/tags/att_input_type.asp
+          if ((tagName === 'INPUT' &&
+             (
+                 element.type.toUpperCase() === 'TEXT' ||
+                 element.type.toUpperCase() === 'PASSWORD' ||
+                 //element.type.toUpperCase() === 'FILE' ||
+                 element.type.toUpperCase() === 'SEARCH' ||
+                 element.type.toUpperCase() === 'EMAIL' ||
+                 element.type.toUpperCase() === 'NUMBER' ||
+                 element.type.toUpperCase() === 'URL' ||
+                 element.type.toUpperCase() === 'TEL' ||
+                 element.type.toUpperCase() === 'DATETIME' ||
+                 element.type.toUpperCase() === 'MONTH' ||
+                 element.type.toUpperCase() === 'TIME' ||
+                 element.type.toUpperCase() === 'WEEK' ||
+                 element.type.toUpperCase() === 'DATETIME-LOCAL' ||
+                 element.type.toUpperCase() === 'DATE'
+             )) || tagName === 'TEXTAREA') {  // tagName is INPUT and TEXTAREA, and
+            doPrevent = element.readOnly || element.disabled;
+          }else if(tagName == 'DIV'){
+            doPrevent = true;
+          }
+
+          doPrevent = false;
+
+          console.log("doPrevent: ", doPrevent);
+          if (doPrevent) {
+            event.preventDefault();
+          }
+          console.groupEnd();
+      }
+    });
+  </script>
+</body>
+
+</html>

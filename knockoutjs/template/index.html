@@ -1,0 +1,70 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>KnockoutJS - Template</title>
+  <script src="./jquery-3.0.0.min.js" type="text/javascript"></script>
+  <script src="./knockout-3.4.0.js" type="text/javascript"></script>
+</head>
+
+<body>
+
+  <div class="main-canvas">
+    <like-widget></like-widget>
+    <div data-bind='component:{name: "like-widget", params:{value:"like"}}'>
+    </div>
+    <div data-bind="template: {name: 'person-template', data:buyer}"></div>
+
+    <like-widget>
+      <h1>just for test</h1>
+    </like-widget>
+  </div>
+
+  <script type="text/html" id="person-template">
+    <h3 data-bind="text:name"></h3>
+    <p>Credits: <span data-bind="text: credits"></span></p>
+  </script>
+
+  <script type="text/javascript">
+
+    // Overall viewmodel for this screen, along with initial state
+    function ReservationsViewModel() {
+      this.buyer = { name: 'Franklin', credits: 250 };
+    }
+
+    ko.components.register("like-widget", {
+      viewModel: function(params){
+        console.log(params);
+        // this.buyer = { name: 'Franklin', credits: 250 };
+        this.name = "Michael";
+        this.credits = 300;
+        this.chosenValue = ko.observable(params&&params.value?params&&params.value:undefined);
+        this.like = function(){
+          this.chosenValue("like");
+        }.bind(this);
+        this.dislike = function(){
+          console.log(arguments);
+          this.chosenValue("dislike");
+        }.bind(this);
+      },
+      template:
+      '\
+      <!-- ko template: { name:"person-template" } --><!-- /ko -->\
+      <div data-bind="visible: !chosenValue()">\
+        <button data-bind="click: like">Like it</button>\
+        <button data-bind="click: dislike">Dislike it</button>\
+      </div>\
+      <div>\
+        You <strong data-bind="text: chosenValue"></strong> it\
+      </div>\
+      <!-- ko template: { nodes:$componentTemplateNodes } --><!-- /ko -->\
+      '
+    });
+
+    ko.applyBindings(new ReservationsViewModel());
+  </script>
+
+
+</body>
+
+</html>
